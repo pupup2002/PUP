@@ -1,9 +1,18 @@
-import 'package:flutter/cupertino.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:pupup_app/authServices/auth.dart';
+
+import 'home.dart';
 
 class SignUpButtons extends StatelessWidget {
-  const SignUpButtons(this.phoneNumber, {super.key});
+  SignUpButtons(this.phoneNumber, {super.key});
   final void Function(String accept) phoneNumber;
+
+  final _auth = AuthService();
 
   @override
   Widget build(context) {
@@ -14,29 +23,29 @@ class SignUpButtons extends StatelessWidget {
           // mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(
-                  padding: EdgeInsets.only(top: 180),
+                  padding: const EdgeInsets.only(top: 180),
                   child: Text(
                     'LET\'S GET STARTED',
                     textAlign: TextAlign.center,
-                    // style: GoogleFonts.poppins(
-                    //   textStyle: const TextStyle(
-                    //     color: Colors.white,
-                    //     fontSize: 22,
-                    //     letterSpacing: 0.5,
-                    //     fontWeight: FontWeight.w500,
-                    //   ),
-                    // ),
+                    style: GoogleFonts.poppins(
+                      textStyle: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        letterSpacing: 0.5,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
 
             const SizedBox(
-              height: 185,
+              height: 200,
             ),
 
             // CREATE ACCOUNT PHONE NUMBER BUTTON
@@ -45,7 +54,7 @@ class SignUpButtons extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 50),
               child: ElevatedButton(
                 onPressed: () {
-                  // phoneNumber('phoneNumberScreen');
+                  phoneNumber('phoneNumberScreen');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(210, 0, 0, 0),
@@ -68,24 +77,36 @@ class SignUpButtons extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 50),
               child: ElevatedButton(
-                onPressed: () {
-                  // AuthMethods().signinwithGoogle(context);
+                onPressed: () async {
+                  try {
+                    UserCredential? userCredential = await _auth.logInWithGoogle();
+                    if (userCredential != null) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const HomePage()),
+                      );
+                    }
+                  } catch (e) {
+                    if (kDebugMode) {
+                      print("Error logging in with Google: $e");
+                    }
+                  }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 88, 176, 203),
+                  backgroundColor: const Color.fromARGB(255, 88, 176, 203),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(40),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // SvgPicture.asset(
-                    //   'assets/google-icon.svg', // Ensure this path is correct
-                    //   height: 19,
-                    // ),
-                    SizedBox(width: 7),
-                    Text(
+                    SvgPicture.asset(
+                      'assets/google-icon.svg', // Ensure this path is correct
+                      height: 19,
+                    ),
+                    const SizedBox(width: 7),
+                    const Text(
                       'CONTINUE WITH GOOGLE',
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -96,6 +117,7 @@ class SignUpButtons extends StatelessWidget {
                 ),
               ),
             ),
+
             const SizedBox(height: 10),
 
             // APPLE LOGIN BUTTON
@@ -104,7 +126,7 @@ class SignUpButtons extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 88, 176, 203),
+                  backgroundColor: const Color.fromARGB(255, 88, 176, 203),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(40),
                   ),
@@ -136,3 +158,5 @@ class SignUpButtons extends StatelessWidget {
     );
   }
 }
+
+
